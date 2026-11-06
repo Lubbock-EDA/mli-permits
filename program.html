@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MLI Grant Program Name</title>     <!-- the script changes this to the area's name -->
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Antonio:wght@500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="common.js"></script>
+</head>
+<body>
+
+  <header>
+    <a href="index.html">&larr; All grant programs</a>
+	<h1 id="areaTitle">Loading...</h1>
+	<p>MLI Grant Program Name</p>
+  </header>
+  
+  <main>
+    <div class="stats">
+	  <div class="stat"><div class="statNumber" id="statCount">...</div><div class="statLabel">Grants Awarded
+	  </div></div>
+	  <div class="stat"><div class="statNumber" id="statGranted">...</div><div class="statLabel">Total Granted
+	  </div></div>
+	  <div class="stat"><div class="statNumber" id="statInvested">...</div><div class="statLabel">Private Investment
+	  </div></div>
+	  <div class="stat"><div class="statNumber" id="statPerDollar">...</div><div class="statLabel">Invested per $1 Granted
+	  </div></div>
+	</div>
+	
+	<!-- "This program is open" box. Edit the contact details to the real ones -->
+	<div class="callout">
+	  <strong>This program is open.</strong>
+	  Own or lease a building in the <span id="calloutArea">this</span> district and planning a renovation?
+	  Contact MLI at <a href="mailto:jorge.quirino@lubbockeda.org">jorge.quirino@lubbockeda.org</a> to find out
+	  if your project qualifies.
+	</div>
+	
+	<div id="map"></div>
+	
+	<h2>Projects</h2>
+	<div class="tableWrap">
+	  <table> 
+	    <thead>
+		  <tr>
+		    <th>Started</th><th>Business / Owner</th><th>Address</th>
+			<th class="money">Grant</th><th class="money">Private Investment</th><th>Completed</th>
+		  </tr>
+		</thead>
+		<tbody id="projectRows"></tbody>    <!-- the script adds one row per grant -->
+	  </table>
+	</div>
+	</main>
+	
+	<script>
+	// Read which area to show from the web address. 
+	// "program.html?area=east" -> key = "east"
+	const key = new URLSearchParams(window.location.search).get('area'); 
+	const area = AREAS[key]; 
+	
+	// Unknown or missing area? Say so and stop.
+	if (!area) {
+	  document.getElementById('areaTitle').textContent = 'Program not found'; 
+	  throw new Error('Unknown area: ' + key);     // stops the rest of this script
+	}
+	
+	// Put the area's name in the heading, the browser tab, and the callout
+	document.getElementById('areaTitle').textContent = area.name; 
+	document.getElementById('calloutArea').textContent = area.name; 
+	document.title = area.name + ' | MLI Renovation Grants Name' ; 
+	
+	const map = makeMap('map'); 
+	
+	loadGrants().then(all => {
+	  // Keep only this area's grants
+	  const grants = all.filter(g => g.properties.areaKey === key);
+	  
+	  fillStats(grants); 
+	  
+	  // Draw them and zoom to fit. maxZoom stops a single parcel from
+	  // zooming in past where the background map has detail.
+	  const layer = drawGrants(map, grants); 
+	  map.fitBounds(layer.getBounds(), { padding: [30, 30], maxZoom: 16}); 
+	  
+	  // Project table: newest first, then biggest grant first 
+	  grants.sort((a, b) =>
+	    (b.properties.began || 0) - (a.properties.began || 0) ||
+		(b.properties.grant || 0) - (a.properties.grant || 0)); 
+		
+	  const rows = document.getElementById('projectRows'); 
+	  grants.forEach(g => {
+	    const p = g.properties; 
+		const tr = document.createElement('tr'); 
+		tr.innerHTML = `
+		  <td>${p.began || ''}</td>
+		  <td>${p.company}</td>
+		  <td>${p.address}</td>
+		  <td class="money">${money(p.grant)}</td>
+		  <td class="money">${money(p.investment)}</td>
+		  <td>${p.completed}</td>
+		`; 
+		rows.appendChild(tr); 
+	    }); 
+	  }); 
+	</script>
+  </body>
+  </html>
+	

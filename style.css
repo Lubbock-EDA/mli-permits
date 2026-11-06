@@ -1,0 +1,108 @@
+/* ==================================================================
+    style.css - shared by index.html and program.html, so both pages
+    look the same and a change here fixes both.
+   ================================================================ */
+	
+/* Brand colors, defined once and reused below with var(--name) */
+:root {
+  --black: #040707;      /* LEDA black */
+  --slate: #243746;      /* LEDA slate */
+  --teal:  #006072;      /* LEDA teal  */
+  --taupe: #c5b9ac;      /* LEDA taupe */
+  --paper: #f6f4f1;      /* light taupe tint for the page background */
+  --white: #ffffff;      
+}
+
+/* The whole page */
+body {
+  margin: 0; 
+  background: var(--paper); 
+  color: var(--slate); 
+  font-family: Arial, sans-serif; 
+  font-size: 15px; 
+}
+
+/* Headings use LEDA's heading font, Antonio (loaded from Google Fonts) */
+
+h1, h2, .statNumber { font-family: 'Antonio', Arial, sans-serif; } 
+
+/* Slate banner across the top */
+header {
+  background: var(--slate); 
+  color: var(--white); 
+  padding: 28px 24px; 
+}
+header h1 { margin: 0; font-size: 34px; letter-spacing: 0.5px; } 
+header p  { margin: 6px 0 0; color: var(--taupe); } 
+header a  { color: var(--taupe); text-decoration: none; font-size: 14px; } 
+header a:hover {color: var(--white); } 
+
+/* Keeps content from stretching too wide on big screens */
+main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; } 
+
+/* The row of number cards. "flex-wrap" lets cards drop to a new 
+   line on narrow screens (phones) instead of squishing */
+.stats { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; } 
+.stat {
+  flex: 1 1 150px;     /* grow to fill, but never narrower than 150 px (2 per row on phones */
+  background:  var(--white); 
+  border-top: 4px solid var(--teal); 
+  border-radius: 6px; 
+  padding: 14px 16px; 
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08); 
+}
+.statNumber { font-size: 36px; color: var(--teal); line-height: 1.1; } 
+.statLabel  { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+/* The map box */
+#map {
+  height: 520px; 
+  border-radius: 6px; 
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12); 
+  margin-bottom: 26px; 
+}
+
+/* Section headings */
+h2 { font-size: 26px; margin: 8px 0 12px; } 
+
+/* The program buttons (landing page). "grid lays them out in 
+   tidy columns that also re-flow on phones. */
+.areaButtons { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); 
+  gap: 14px; 
+} 
+.areaButton { 
+  display: block; 
+  background: var(--white); 
+  border-left: 8px solid var(--teal);     /* JavaScript swaps in each area's color */
+  border-radius: 6px; 
+  padding: 16px; 
+  text-decoration: none; 
+  color: var(--slate); 
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08); 
+}
+.areaButton:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.18); } 
+.areaName { font-family: 'Antonio', Arial, sans-serif; font-size: 24px; } 
+.areaInfo { font-size: 13px; margin-top: 4px; } 
+
+/* "This program is open" box (program pages) */
+.callout { 
+  background: var(--white); 
+  border: 2px solid var(--teal); 
+  border-radius: 6px; 
+  padding: 16px 18px; 
+  margin-bottom: 26px; 
+}
+.callout strong { color: var(--teal); } 
+
+/* The project table (program pages) */
+table { width: 100%; border-collapse: collapse; background: var(--white); font-size: 14px; } 
+th {background: var(--slate); color: var(--white); text-align: left; padding: 8px 10px; } 
+td { padding: 8px 10px; border-bottom: 1px solid #e6e1db; } 
+td.money, th.money { text-align: right; } 
+/* On phones, let the table scroll sideways instead of breaking the page */
+.tableWrap { overflow-x: auto; }
+   
+   
+   
