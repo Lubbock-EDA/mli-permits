@@ -8,10 +8,10 @@
 // The order here is the order the buttons appear.
 
 const AREAS = { 
-  'downtown':         { name: 'Downtown',         color: '#006072' },    // LEDA teal
-  'east':             { name: 'East Lubbock',     color: '#243746' },    // LEDA slate
-  '34th':             { name: '34th Street',      color: '#c5b9ac' },    // LEDA taupe
-  'north-university': { name: 'North University', color: '#040707' }     // LEDA black
+  'downtown':         { name: 'Downtown',         color: '#e90802' },    // Texas Tech red
+  'east':             { name: 'East Lubbock',     color: '#d6248f' },    // Magenta
+  '34th':             { name: '34th Street',      color: '#efb334' },    // Visit Lubbock gold
+  'north-university': { name: 'North University', color: '#8e5cf7' }     // Violet
 }; 
 
 // Money with commas: 1234567 -> "$1,234,567"
@@ -26,16 +26,39 @@ function shortMoney(n) {
   return money(n); 
 } 
 
-// Creates a map in the box with this id, with the gray background + labels
-function makeMap(boxId) { 
-  const map = L.map(boxId, { zoomSnap: 0.25 });  
-  
- L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri', maxZoom: 16
-  }).addTo(map);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 16
-  }).addTo(map); 
+// Creates a map in the box with this id, with Road and Satellite backgrounds
+function makeMap(boxId) {
+  const map = L.map(boxId, { zoomSnap: 0.25 });
+
+  // ROAD map: the gray map + its street labels, bundled into one group
+  const roadMap = L.layerGroup([
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri', maxZoom: 16
+    }),
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16
+    })
+  ]);
+
+  // SATELLITE map: aerial photos + street names on top
+  const satelliteMap = L.layerGroup([
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics', maxZoom: 19
+    }),
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19
+    })
+  ]);
+
+  roadMap.addTo(map);   // the map starts on Road
+
+  // Layers box with Road / Satellite radio buttons. "null" = no
+  // checkbox layers on this map, just the two backgrounds.
+  L.control.layers({
+    'Road':      roadMap,
+    'Satellite': satelliteMap
+  }, null, { collapsed: false, position: 'topright' }).addTo(map);
+
   return map; 
 }
 
@@ -82,10 +105,10 @@ function drawGrants(map, grants) {
   // 3. Draw them, colored by area, each with a hover box
   return L.geoJSON(shapes, { 
     style: f => ({ 
-	  color: AREAS[f.properties.area].color, 
+	  color: '#ffffff',      // white outline to help the parcels stand out
 	  fillColor: AREAS[f.properties.area].color, 
-	  weight: 1.5, 
-	  fillOpacity: 0.65
+	  weight: 1, 
+	  fillOpacity: 0.8
 	}), 
 	onEachFeature: (f, layer) => { 
 	  const list = f.properties.grants; 
